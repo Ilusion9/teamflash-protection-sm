@@ -1,2 +1,2 @@
-# sm-csgo-antiteamflash
-Anti flash alive teammates.
+# Description
+Anti flash alive teammates (beta version).
