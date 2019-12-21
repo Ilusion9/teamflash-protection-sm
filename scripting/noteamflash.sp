@@ -3,9 +3,9 @@
 
 public Plugin myinfo =
 {
-    name = "Anti Team Flash",
+    name = "No Team Flash",
     author = "Ilusion9",
-    description = "Anti flash alive teammates",
+    description = "Alive teammates cannot be flashed",
     version = "1.0",
     url = "https://github.com/Ilusion9/"
 };
