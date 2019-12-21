@@ -20,21 +20,14 @@ public void OnPluginStart()
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
 {
-	int client = GetClientOfUserId(event.GetInt("userid"));
-	if (!client || !IsClientInGame(client))
+	int thrower = GetClientOfUserId(event.GetInt("userid"));
+	if (!thrower || !IsClientInGame(thrower))
 	{
 		return;
 	}
 	
-	GetFlashDurations(client);
-	RequestFrame(SetFlashDurations);
-}
-
-void GetFlashDurations(int thrower)
-{
-	int teamThrower = GetClientTeam(thrower);
-	
 	// Anti flash alive teammates
+	int teamThrower = GetClientTeam(thrower);
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		g_FlashDuration[i] = NO_FLASH_DURATION;
@@ -43,7 +36,7 @@ void GetFlashDurations(int thrower)
 			continue;
 		}
 		
-		g_FlashDuration[i] = GetEntPropFloat(i, Prop_Send, "m_flFlashDuration");
+		g_FlashDuration[i] = GetClientFlashDuration(i);
 	}
 	
 	// The spectators will see exactly what the player that they are spectating sees
@@ -62,9 +55,11 @@ void GetFlashDurations(int thrower)
 		
 		g_FlashDuration[i] = g_FlashDuration[specTarget];
 	}
+	
+	RequestFrame(SetNewFlashDurations);
 }
 
-void SetFlashDurations(any data)
+void SetNewFlashDurations(any data)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -73,6 +68,16 @@ void SetFlashDurations(any data)
 			continue;
 		}
 		
-		SetEntPropFloat(i, Prop_Send, "m_flFlashDuration", g_FlashDuration[i]);
+		SetClientFlashDuration(i, g_FlashDuration[i]);
 	}
+}
+
+float GetClientFlashDuration(int client)
+{
+	return GetEntPropFloat(client, Prop_Send, "m_flFlashDuration")
+}
+
+void SetClientFlashDuration(int client, float duration)
+{
+	SetEntPropFloat(client, Prop_Send, "m_flFlashDuration", duration);
 }
