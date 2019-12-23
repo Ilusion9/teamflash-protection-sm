@@ -5,7 +5,7 @@ public Plugin myinfo =
 {
     name = "No Team Flash",
     author = "Ilusion9",
-    description = "Alive teammates cannot be flashed",
+    description = "Teammates cannot be flashed",
     version = "1.0",
     url = "https://github.com/Ilusion9/"
 };
@@ -26,7 +26,8 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 		return;
 	}
 	
-	// Anti flash alive teammates
+	// Get teammates flash durations and keep them further (keep the flashes done by the enemy)
+	// For them, the current flash will be ignored
 	int teamThrower = GetClientTeam(thrower);
 	for (int i = 1; i <= MaxClients; i++)
 	{
