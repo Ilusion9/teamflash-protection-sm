@@ -1,2 +1,2 @@
 # Description
-Anti flash alive teammates (beta version).
+Teammates cannot be flashed (beta version).
