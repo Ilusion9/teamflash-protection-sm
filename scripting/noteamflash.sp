@@ -26,8 +26,7 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 		return;
 	}
 	
-	// Get teammates flash durations and keep them further (keep the flashes done by the enemy)
-	// For them, the current flash will be ignored
+	// Get teammates flash durations and keep them further
 	int teamThrower = GetClientTeam(thrower);
 	for (int i = 1; i <= MaxClients; i++)
 	{
@@ -40,7 +39,7 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 		g_FlashDuration[i] = GetClientFlashDuration(i);
 	}
 	
-	// The spectators will see exactly what the player that they are spectating sees
+	// Spectators will see exactly what the target sees
 	for (int i = 1; i <= MaxClients; i++)
 	{		
 		if (!IsClientInGame(i) || !IsClientObserver(i))
@@ -49,7 +48,7 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 		}
 		
 		int specTarget = GetEntPropEnt(i, Prop_Send, "m_hObserverTarget");
-		if (specTarget == -1)
+		if (specTarget < 1 || specTarget > MaxClients)
 		{
 			continue;
 		}
