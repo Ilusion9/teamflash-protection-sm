@@ -10,7 +10,7 @@ public Plugin myinfo =
     url = "https://github.com/Ilusion9/"
 };
 
-#define NO_FLASH_DURATION	0.0
+bool g_SetFlashDuration[MAXPLAYERS + 1];
 float g_FlashDuration[MAXPLAYERS + 1];
 
 public void OnPluginStart()
@@ -30,12 +30,13 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 	int teamThrower = GetClientTeam(thrower);
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		g_FlashDuration[i] = NO_FLASH_DURATION;
+		g_SetFlashDuration[i] = false;
 		if (i == thrower || !IsClientInGame(i) || !IsPlayerAlive(i) || GetClientTeam(i) != teamThrower)
 		{
 			continue;
 		}
 		
+		g_SetFlashDuration[i] = true;
 		g_FlashDuration[i] = GetClientFlashDuration(i);
 	}
 	
@@ -56,14 +57,14 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 		g_FlashDuration[i] = g_FlashDuration[specTarget];
 	}
 	
-	RequestFrame(SetNewFlashDurations);
+	RequestFrame(SetFlashDurations);
 }
 
-void SetNewFlashDurations(any data)
+void SetFlashDurations(any data)
 {
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if (!IsClientInGame(i) || g_FlashDuration[i] == NO_FLASH_DURATION)
+		if (!IsClientInGame(i) || !g_SetFlashDuration[i])
 		{
 			continue;
 		}
@@ -74,7 +75,7 @@ void SetNewFlashDurations(any data)
 
 float GetClientFlashDuration(int client)
 {
-	return GetEntPropFloat(client, Prop_Send, "m_flFlashDuration")
+	return GetEntPropFloat(client, Prop_Send, "m_flFlashDuration");
 }
 
 void SetClientFlashDuration(int client, float duration)
