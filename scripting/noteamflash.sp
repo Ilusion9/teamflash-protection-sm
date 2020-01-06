@@ -36,6 +36,11 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 			continue;
 		}
 		
+		if (!CheckCommandAcces(i, "NoTeamFlash", 0, false))
+		{
+			continue;
+		}
+		
 		g_SetFlashDuration[i] = true;
 		g_FlashDuration[i] = GetClientFlashDuration(i);
 	}
