@@ -36,7 +36,7 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 			continue;
 		}
 		
-		if (!CheckCommandAcces(i, "NoTeamFlash", 0, false))
+		if (!CheckCommandAccess(i, "NoTeamFlash", 0, false))
 		{
 			continue;
 		}
