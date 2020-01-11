@@ -62,7 +62,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	}
 	
 	int client = GetClientOfUserId(userId);
-	if (!client || !IsClientInGame(client) || !CheckCommandAccess(client, "NoTeamFlash", 0, false))
+	if (!client || !IsClientInGame(client))
 	{
 		return;
 	}
