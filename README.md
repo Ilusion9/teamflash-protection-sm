@@ -1,8 +1,6 @@
 # Description
 Team flash manager for CS:GO.
 
-To give access only for players with specific flag: add "NoTeamFlash" override in configs/admin_overrides.cfg.
-
 # Alliedmods
 https://forums.alliedmods.net/showthread.php?p=2677990
 
