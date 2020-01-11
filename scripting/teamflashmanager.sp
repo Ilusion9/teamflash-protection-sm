@@ -96,17 +96,46 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	}
 	else
 	{
-		if (g_Cvar_NoFlash.BoolValue && g_Cvar_NoSpecFlash.BoolValue)
+		if (IsClientObserver(client))
 		{
-			if (IsClientObserver(client))
+			if (GetClientObserverMode(client) != 4)
 			{
-				int specTarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
-				if (specTarget < 1 || specTarget > MaxClients)
-				{
-					return;
-				}
-				
+				return;
+			}
+			
+			int specTarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
+			if (specTarget < 1 || specTarget > MaxClients)
+			{
+				return;
+			}
+			
+			if (g_Cvar_NoFlash.BoolValue && g_Cvar_NoSpecFlash.BoolValue)
+			{
 				SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+			}
+			
+			if (g_Cvar_FlashMessage.BoolValue)
+			{
+				char throwerName[MAX_NAME_LENGTH], targetName[MAX_NAME_LENGTH];
+				int thrower = GetClientOfUserId(g_ThrowerId);
+				
+				if (thrower)
+				{
+					GetClientName(specTarget, targetName, sizeof(targetName));
+					GetClientName(thrower, throwerName, sizeof(throwerName));
+					
+					Format(targetName, sizeof(targetName), "\x07%s\x01", targetName);
+					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
+					
+					PrintToChat(client, "[SM] %t", "Team Flashed Target", targetName, throwerName);
+				}
+				else
+				{
+					GetClientName(specTarget, targetName, sizeof(targetName));
+					Format(targetName, sizeof(targetName), "\x07%s\x01", targetName);
+					
+					PrintToChat(client, "[SM] %t", "Team Flashed Target", targetName, "\x07[disconnected]\x01");
+				}
 			}
 		}
 	}
@@ -121,6 +150,11 @@ void GetFlashDurations()
 			g_FlashDuration[i] = GetClientFlashDuration(i);
 		}
 	}
+}
+
+int GetClientObserverMode(int client)
+{
+	return GetEntProp(client, Prop_Send, "m_iObserverMode");
 }
 
 float GetClientFlashDuration(int client)
