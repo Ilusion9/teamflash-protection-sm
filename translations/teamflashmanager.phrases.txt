@@ -5,4 +5,10 @@
 		"#format"		"{1:s}"
 		"en"			"You have been teamflashed by {1}"
 	}
+	
+	"Team Flashed Target"
+	{
+		"#format"		"{1:s}, {1:s}"
+		"en"			"{1} has been teamflashed by {2}"
+	}
 }
