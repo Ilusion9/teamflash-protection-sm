@@ -1,0 +1,8 @@
+"Phrases"
+{
+	"Team Flashed"
+	{
+		"#format"		"{1:s}"
+		"en"			"You have been teamflashed by {1}"
+	}
+}
