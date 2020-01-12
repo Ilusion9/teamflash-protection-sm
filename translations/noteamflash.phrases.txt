@@ -1,0 +1,14 @@
+"Phrases"
+{
+	"Team Flashed"
+	{
+		"#format"		"{1:s}"
+		"en"			"Your teammate, {1}, flashed you!"
+	}
+	
+	"Team Flashed Target"
+	{
+		"#format"		"{1:s}, {1:s}"
+		"en"			"{1} has been flashed by his teammate, {2}"
+	}
+}
