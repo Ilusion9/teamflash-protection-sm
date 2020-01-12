@@ -2,6 +2,8 @@
 #include <sdktools>
 #include <cstrike>
 
+#pragma newdecls required
+
 public Plugin myinfo =
 {
     name = "No Team Flash",
@@ -15,10 +17,20 @@ int g_ThrowerId;
 int g_ThrowerTeam;
 float g_FlashDuration[MAXPLAYERS + 1];
 
+ConVar g_Cvar_NoTeamFlash;
+ConVar g_Cvar_MessageTeamFlash;
+
 public void OnPluginStart()
-{	
+{
+	LoadTranslations("noteamflash.phrases");
+	
+	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by flashes done by teammates or not.", FCVAR_NONE, true, 0.0, true, 1.0);
+	g_Cvar_MessageTeamFlash = CreateConVar("sm_team_flash_message", "1", "Determine whether players should be announced when teammates blinds them or not.", FCVAR_NONE, true, 0.0, true, 1.0);
+	
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
+	
+	AutoExecConfig(true, "noteamflash");
 }
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
@@ -59,9 +71,26 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	{
 		if (GetClientTeam(client) == g_ThrowerTeam)
 		{
-			if (CheckCommandAccess(client, "NoTeamFlash", 0, false))
+			if (g_Cvar_NoTeamFlash.BoolValue)
 			{
-				SetClientFlashDuration(client, g_FlashDuration[client]);
+				if (CheckCommandAccess(client, "NoTeamFlash", 0, false))
+				{
+					SetClientFlashDuration(client, g_FlashDuration[client]);
+				}
+			}
+			
+			if (g_Cvar_MessageTeamFlash.BoolValue)
+			{
+				char throwerName[MAX_NAME_LENGTH] = "\x07[disconnected]\x01";
+				int thrower = GetClientOfUserId(g_ThrowerId);
+				
+				if (thrower)
+				{
+					GetClientName(thrower, throwerName, sizeof(throwerName));
+					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
+				}
+				
+				PrintToChat(client, "[SM] %t", "Team Flashed", throwerName);
 			}
 		}
 	}
@@ -69,6 +98,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	{
 		if (IsClientObserver(client))
 		{
+			/* First person mode */
 			if (GetClientObserverMode(client) != 4)
 			{
 				return;
@@ -80,7 +110,28 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 				return;
 			}
 			
-			SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+			if (g_Cvar_NoTeamFlash.BoolValue)
+			{
+				SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+			}
+			
+			if (g_Cvar_MessageTeamFlash.BoolValue)
+			{
+				char targetName[MAX_NAME_LENGTH];
+				char throwerName[MAX_NAME_LENGTH] = "\x07[disconnected]\x01";
+				int thrower = GetClientOfUserId(g_ThrowerId);
+				
+				if (thrower)
+				{
+					GetClientName(specTarget, targetName, sizeof(targetName));
+					Format(targetName, sizeof(targetName), "\x04%s\x01", targetName);
+					
+					GetClientName(thrower, throwerName, sizeof(throwerName));
+					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
+				}
+				
+				PrintToChat(client, "[SM] %t", "Team Flashed Target", targetName, throwerName);
+			}
 		}
 	}
 }
