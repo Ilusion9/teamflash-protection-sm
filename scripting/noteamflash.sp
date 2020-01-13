@@ -13,8 +13,6 @@ public Plugin myinfo =
     url = "https://github.com/Ilusion9/"
 };
 
-#define CHAT_TAG	"\x04[Team Flash]\x01"
-
 int g_ThrowerId;
 int g_ThrowerTeam;
 float g_FlashDuration[MAXPLAYERS + 1];
@@ -94,10 +92,10 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 					char clientName[MAX_NAME_LENGTH];
 					GetClientName(client, clientName, sizeof(clientName));
 					Format(clientName, sizeof(clientName), "\x04%s\x01", clientName);
-					PrintToChat(thrower, " %s %t", CHAT_TAG, "Flashed a Teammate", clientName);
+					PrintToChat(thrower, " \x04[Team Flash]\x01 %t", "Flashed a Teammate", clientName);
 				}
 				
-				PrintToChat(client, " %s %t", CHAT_TAG, "Flashed by Teammate", throwerName);
+				PrintToChat(client, " \x04[Team Flash]\x01 %t", "Flashed by Teammate", throwerName);
 			}
 		}
 	}
@@ -131,13 +129,13 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 				if (thrower)
 				{
 					GetClientName(specTarget, targetName, sizeof(targetName));
-					Format(targetName, sizeof(targetName), "\x04%s\x01", targetName);
+					Format(targetName, sizeof(targetName), "\x07%s\x01", targetName);
 					
 					GetClientName(thrower, throwerName, sizeof(throwerName));
 					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
 				}
 				
-				PrintToChat(client, " %s %t", CHAT_TAG, "Target Flashed by Teammate", targetName, throwerName);
+				PrintToChat(client, " \x04[Team Flash]\x01 %t", "Target Flashed by Teammate", targetName, throwerName);
 			}
 		}
 	}
