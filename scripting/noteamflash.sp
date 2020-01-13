@@ -21,7 +21,7 @@ ConVar g_Cvar_NoTeamFlash;
 
 public void OnPluginStart()
 {
-	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by flashes done by teammates or not.", FCVAR_NONE, true, 0.0, true, 1.0);
+	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
 	
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
@@ -84,12 +84,15 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 			}
 			
 			int specTarget = GetEntPropEnt(client, Prop_Send, "m_hObserverTarget");
-			if (specTarget < 1 || specTarget > MaxClients)
+			if (specTarget < 1 || specTarget > MaxClients || !IsClientInGame(specTarget))
 			{
 				return;
 			}
 			
-			SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+			if (GetClientTeam(specTarget) == g_ThrowerTeam)
+			{
+				SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+			}
 		}
 	}
 }
