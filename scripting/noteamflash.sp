@@ -13,6 +13,8 @@ public Plugin myinfo =
     url = "https://github.com/Ilusion9/"
 };
 
+#define CHAT_TAG	"\x04[Team Flash]\x01"
+
 int g_ThrowerId;
 int g_ThrowerTeam;
 float g_FlashDuration[MAXPLAYERS + 1];
@@ -92,10 +94,10 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 					char clientName[MAX_NAME_LENGTH];
 					GetClientName(client, clientName, sizeof(clientName));
 					Format(clientName, sizeof(clientName), "\x04%s\x01", clientName);
-					PrintToChat(thrower, "[SM] %t", "Flashed a Teammate", clientName);
+					PrintToChat(thrower, " %s %t", CHAT_TAG, "Flashed a Teammate", clientName);
 				}
 				
-				PrintToChat(client, "[SM] %t", "Flashed by Teammate", throwerName);
+				PrintToChat(client, " %s %t", CHAT_TAG, "Flashed by Teammate", throwerName);
 			}
 		}
 	}
@@ -135,7 +137,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
 				}
 				
-				PrintToChat(client, "[SM] %t", "Target Flashed by Teammate", targetName, throwerName);
+				PrintToChat(client, " %s %t", CHAT_TAG, "Target Flashed by Teammate", targetName, throwerName);
 			}
 		}
 	}
