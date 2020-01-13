@@ -81,17 +81,14 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 			
 			if (g_Cvar_MessageTeamFlash.BoolValue)
 			{
+				char clientName[MAX_NAME_LENGTH];
 				char throwerName[MAX_NAME_LENGTH] = "[disconnected]";
-				int thrower = GetClientOfUserId(g_ThrowerId);
 				
+				int thrower = GetClientOfUserId(g_ThrowerId);
 				if (thrower)
 				{
 					GetClientName(thrower, throwerName, sizeof(throwerName));
-					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
-					
-					char clientName[MAX_NAME_LENGTH];
 					GetClientName(client, clientName, sizeof(clientName));
-					Format(clientName, sizeof(clientName), "\x04%s\x01", clientName);
 					PrintToChat(thrower, " \x04[Team Flash]\x01 %t", "Flashed a Teammate", clientName);
 				}
 				
@@ -124,17 +121,14 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 			{
 				char targetName[MAX_NAME_LENGTH];
 				char throwerName[MAX_NAME_LENGTH] = "[disconnected]";
-				int thrower = GetClientOfUserId(g_ThrowerId);
 				
+				int thrower = GetClientOfUserId(g_ThrowerId);
 				if (thrower)
 				{
-					GetClientName(specTarget, targetName, sizeof(targetName));
-					Format(targetName, sizeof(targetName), "\x07%s\x01", targetName);
-					
 					GetClientName(thrower, throwerName, sizeof(throwerName));
-					Format(throwerName, sizeof(throwerName), "\x04%s\x01", throwerName);
 				}
 				
+				GetClientName(specTarget, targetName, sizeof(targetName));
 				PrintToChat(client, " \x04[Team Flash]\x01 %t", "Target Flashed by Teammate", targetName, throwerName);
 			}
 		}
