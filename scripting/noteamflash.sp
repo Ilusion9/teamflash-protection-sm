@@ -31,6 +31,14 @@ public void OnPluginStart()
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
 {
+	GetFlashDurations();
+	g_ThrowerTeam = CS_TEAM_NONE;
+	
+	if (!g_Cvar_NoTeamFlash.BoolValue)
+	{
+		return;
+	}
+	
 	g_ThrowerId = event.GetInt("userid");
 	int client = GetClientOfUserId(g_ThrowerId);
 	
@@ -41,7 +49,6 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 	}
 	
 	g_ThrowerTeam = GetClientTeam(client);
-	GetFlashDurations();
 }
 
 public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast)
