@@ -1,39 +1,43 @@
 #include <sourcemod>
 #include <sdktools>
 #include <cstrike>
-
 #pragma newdecls required
 
 public Plugin myinfo =
 {
     name = "No Team Flash",
     author = "Ilusion9",
-    description = "Players will not be flashed by teammates",
-    version = "1.0",
+    description = "Players will not be flashed by their teammates.",
+    version = "1.1",
     url = "https://github.com/Ilusion9/"
 };
 
 int g_ThrowerId;
 int g_ThrowerTeam;
-float g_FlashDuration[MAXPLAYERS + 1];
-
+float g_FlashExpireTime[MAXPLAYERS + 1];
 ConVar g_Cvar_NoTeamFlash;
 
 public void OnPluginStart()
 {
-	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
-	
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
 	
+	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
 	AutoExecConfig(true, "noteamflash");
 }
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
 {
-	GetFlashDurations();
+	float gameTime = GetGameTime();
+	for (int i = 1; i <= MaxClients; i++)
+	{
+		if (IsClientInGame(i))
+		{
+			g_FlashExpireTime[i] = gameTime + GetClientFlashDuration(i);
+		}
+	}
+
 	g_ThrowerTeam = CS_TEAM_NONE;
-	
 	if (!g_Cvar_NoTeamFlash.BoolValue)
 	{
 		return;
@@ -76,7 +80,8 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 		{
 			if (CheckCommandAccess(client, "NoTeamFlash", 0, false))
 			{
-				SetClientFlashDuration(client, g_FlashDuration[client]);
+				float newFlashDuration = g_FlashExpireTime[client] - GetGameTime();
+				SetClientFlashDuration(client, newFlashDuration > 0 ? newFlashDuration : 0.0);
 			}
 		}
 	}
@@ -96,21 +101,13 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 				return;
 			}
 			
-			if (GetClientTeam(specTarget) == g_ThrowerTeam)
+			if (GetClientTeam(specTarget) != g_ThrowerTeam)
 			{
-				SetClientFlashDuration(client, g_FlashDuration[specTarget]);
+				return;
 			}
-		}
-	}
-}
-
-void GetFlashDurations()
-{
-	for (int i = 1; i <= MaxClients; i++)
-	{
-		if (IsClientInGame(i))
-		{
-			g_FlashDuration[i] = GetClientFlashDuration(i);
+			
+			float newFlashDuration = g_FlashExpireTime[specTarget] - GetGameTime();
+			SetClientFlashDuration(client, newFlashDuration > 0 ? newFlashDuration : 0.0);
 		}
 	}
 }
