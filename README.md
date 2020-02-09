@@ -1,5 +1,5 @@
 # Description
-Players will not be flashed by teammates.
+Players will not be flashed by their teammates.
 
 To give access only for players with specific flag, set "NoTeamFlash" override in admin_overrides.cfg.
 
