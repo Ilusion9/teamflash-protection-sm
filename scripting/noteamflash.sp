@@ -81,7 +81,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 			if (CheckCommandAccess(client, "NoTeamFlash", 0, false))
 			{
 				float newFlashDuration = g_FlashExpireTime[client] - GetGameTime();
-				SetClientFlashDuration(client, newFlashDuration > 0 ? newFlashDuration : 0.0);
+				SetClientFlashDuration(client, newFlashDuration > 0.0 ? newFlashDuration : 0.0);
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 			}
 			
 			float newFlashDuration = g_FlashExpireTime[specTarget] - GetGameTime();
-			SetClientFlashDuration(client, newFlashDuration > 0 ? newFlashDuration : 0.0);
+			SetClientFlashDuration(client, newFlashDuration > 0.0 ? newFlashDuration : 0.0);
 		}
 	}
 }
