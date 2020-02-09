@@ -8,5 +8,5 @@ https://forums.alliedmods.net/showthread.php?p=2677990
 
 # ConVars
 ```
-sm_no_team_flash 1 // Determine whether players should be protected by team flashes or not.
+sm_noteamflash 1 // Determine whether players should be protected by team flashes or not.
 ```
