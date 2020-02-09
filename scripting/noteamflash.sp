@@ -22,7 +22,7 @@ public void OnPluginStart()
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
 	
-	g_Cvar_NoTeamFlash = CreateConVar("sm_no_team_flash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
+	g_Cvar_NoTeamFlash = CreateConVar("sm_noteamflash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
 	AutoExecConfig(true, "noteamflash");
 }
 
