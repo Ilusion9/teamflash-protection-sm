@@ -5,7 +5,7 @@ Players will not be flashed by their teammates.
 https://forums.alliedmods.net/showthread.php?p=2677990
 
 # Overrides
-Add "TeamFlashProtection" override in admin_overrides.cfg to give access to players with specific flags.
+Add "TeamFlashProtection" override in admin_overrides.cfg to give access to players with specific flag.
 
 # ConVars
 ```
