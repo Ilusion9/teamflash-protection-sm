@@ -9,5 +9,5 @@ Add "TeamFlashProtection" override in admin_overrides.cfg to give access to play
 
 # ConVars
 ```
-sm_teamflash_protection 1 // Protect players against flashbangs throwned by their teammates?
+sm_teamflash_protection 1 // Protect players against flashes made by their teammates?
 ```
