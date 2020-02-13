@@ -5,9 +5,9 @@
 
 public Plugin myinfo =
 {
-    name = "No Team Flash",
+    name = "Team Flash Protection",
     author = "Ilusion9",
-    description = "Players will not be flashed by their teammates.",
+    description = "Players will not be flashed by their teammates",
     version = "1.1",
     url = "https://github.com/Ilusion9/"
 };
@@ -22,8 +22,8 @@ public void OnPluginStart()
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
 	
-	g_Cvar_NoTeamFlash = CreateConVar("sm_noteamflash", "1", "Determine whether players should be protected by team flashes or not.", FCVAR_NONE, true, 0.0, true, 1.0);
-	AutoExecConfig(true, "noteamflash");
+	g_Cvar_NoTeamFlash = CreateConVar("sm_teamflash_protection", "1", "Protect players against flashes made by their teammates?", FCVAR_NONE, true, 0.0, true, 1.0);
+	AutoExecConfig(true, "teamflash_protection");
 }
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
@@ -78,7 +78,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	{
 		if (GetClientTeam(client) == g_ThrowerTeam)
 		{
-			if (CheckCommandAccess(client, "NoTeamFlash", 0, false))
+			if (CheckCommandAccess(client, "TeamFlashProtection", 0, false))
 			{
 				float newFlashDuration = g_FlashExpireTime[client] - GetGameTime();
 				SetClientFlashDuration(client, newFlashDuration > 0.0 ? newFlashDuration : 0.0);
