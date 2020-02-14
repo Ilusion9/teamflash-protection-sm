@@ -1,4 +1,5 @@
 #include <sourcemod>
+#include <sdkhooks>
 #include <sdktools>
 #include <cstrike>
 #pragma newdecls required
@@ -12,18 +13,63 @@ public Plugin myinfo =
     url = "https://github.com/Ilusion9/"
 };
 
-int g_ThrowerId;
-int g_ThrowerTeam;
+enum struct ThrowerInfo
+{
+	int Id;
+	int Team;
+}
+
+ThrowerInfo g_Thrower;
 float g_FlashExpireTime[MAXPLAYERS + 1];
-ConVar g_Cvar_NoTeamFlash;
+
+StringMap g_Map_FlashThrowerTeam;
+ConVar g_Cvar_FlashProtection;
 
 public void OnPluginStart()
 {
+	g_Map_FlashThrowerTeam = new StringMap();
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
 	
-	g_Cvar_NoTeamFlash = CreateConVar("sm_teamflash_protection", "1", "Protect players against flashes made by their teammates?", FCVAR_NONE, true, 0.0, true, 1.0);
+	g_Cvar_FlashProtection = CreateConVar("sm_teamflash_protection", "1", "Protect players against flashes made by their teammates?", FCVAR_NONE, true, 0.0, true, 1.0);
 	AutoExecConfig(true, "teamflash_protection");
+}
+
+public void OnMapStart()
+{
+	g_Map_FlashThrowerTeam.Clear();
+}
+
+public void OnEntityCreated(int entity, const char[] classname)
+{
+	if (StrEqual(classname, "flashbang_projectile"))
+	{
+		SDKHook(entity, SDKHook_SpawnPost, SDK_OnFlashbangProjectileSpawn_Post);
+	}
+}
+
+public void SDK_OnFlashbangProjectileSpawn_Post(int entity)
+{
+	RequestFrame(Frame_FlashbangProjectileSpawn, EntIndexToEntRef(entity));
+}
+
+public void Frame_FlashbangProjectileSpawn(any data)
+{
+	int entity = EntRefToEntIndex(view_as<int>(data));
+	if (entity == INVALID_ENT_REFERENCE)
+	{
+		return;
+	}
+	
+	int thrower = GetEntPropEnt(entity, Prop_Send, "m_hThrower");	
+	if (thrower < 1 || thrower > MaxClients || !IsClientInGame(thrower))
+	{
+		return;
+	}
+	
+	char key[64];
+	IntToString(entity, key, sizeof(key));
+	g_Map_FlashThrowerTeam.SetValue(key, GetClientTeam(thrower));
 }
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
@@ -36,34 +82,30 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 			g_FlashExpireTime[i] = gameTime + GetClientFlashDuration(i);
 		}
 	}
-
-	g_ThrowerTeam = CS_TEAM_NONE;
-	if (!g_Cvar_NoTeamFlash.BoolValue)
+	
+	g_Thrower.Id = event.GetInt("userid");
+	
+	char key[64];
+	int entity = event.GetInt("entityid");
+	IntToString(entity, key, sizeof(key));
+	
+	if (!g_Map_FlashThrowerTeam.GetValue(key, g_Thrower.Team))
 	{
-		return;
+		g_Thrower.Team = CS_TEAM_NONE;
 	}
 	
-	g_ThrowerId = event.GetInt("userid");
-	int client = GetClientOfUserId(g_ThrowerId);
-	
-	if (!client || !IsClientInGame(client))
-	{
-		g_ThrowerTeam = CS_TEAM_NONE;
-		return;
-	}
-	
-	g_ThrowerTeam = GetClientTeam(client);
+	g_Map_FlashThrowerTeam.Remove(key);
 }
 
 public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast)
 {
-	if (!g_Cvar_NoTeamFlash.BoolValue || g_ThrowerTeam == CS_TEAM_NONE)
+	if (!g_Cvar_FlashProtection.BoolValue || g_Thrower.Team == CS_TEAM_NONE)
 	{
 		return;
 	}
 	
 	int userId = event.GetInt("userid");
-	if (g_ThrowerId == userId)
+	if (g_Thrower.Id == userId)
 	{
 		return;
 	}
@@ -76,7 +118,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 	
 	if (IsPlayerAlive(client))
 	{
-		if (GetClientTeam(client) == g_ThrowerTeam)
+		if (GetClientTeam(client) == g_Thrower.Team)
 		{
 			if (CheckCommandAccess(client, "TeamFlashProtection", 0, false))
 			{
@@ -101,7 +143,7 @@ public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast
 				return;
 			}
 			
-			if (GetClientTeam(specTarget) != g_ThrowerTeam)
+			if (GetClientTeam(specTarget) != g_Thrower.Team)
 			{
 				return;
 			}
