@@ -2,6 +2,7 @@
 #include <sdkhooks>
 #include <sdktools>
 #include <cstrike>
+#include <intmap>
 #pragma newdecls required
 
 public Plugin myinfo =
@@ -22,12 +23,12 @@ enum struct ThrowerInfo
 ThrowerInfo g_Thrower;
 float g_FlashExpireTime[MAXPLAYERS + 1];
 
-StringMap g_Map_FlashThrowerTeam;
+IntMap g_FlashbangsTeam;
 ConVar g_Cvar_FlashProtection;
 
 public void OnPluginStart()
 {
-	g_Map_FlashThrowerTeam = new StringMap();
+	g_FlashbangsTeam = new IntMap();
 	HookEvent("flashbang_detonate", Event_FlashbangDetonate);
 	HookEvent("player_blind", Event_PlayerBlind);
 	
@@ -37,7 +38,7 @@ public void OnPluginStart()
 
 public void OnMapStart()
 {
-	g_Map_FlashThrowerTeam.Clear();
+	g_FlashbangsTeam.Clear();
 }
 
 public void OnEntityCreated(int entity, const char[] classname)
@@ -67,9 +68,7 @@ public void Frame_FlashbangProjectileSpawn(any data)
 		return;
 	}
 	
-	char key[64];
-	IntToString(entity, key, sizeof(key));
-	g_Map_FlashThrowerTeam.SetValue(key, GetClientTeam(thrower));
+	g_FlashbangsTeam.SetValue(entity, GetClientTeam(thrower));
 }
 
 public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBroadcast)
@@ -84,17 +83,14 @@ public void Event_FlashbangDetonate(Event event, const char[] name, bool dontBro
 	}
 	
 	g_Thrower.Id = event.GetInt("userid");
-	
-	char key[64];
 	int entity = event.GetInt("entityid");
-	IntToString(entity, key, sizeof(key));
 	
-	if (!g_Map_FlashThrowerTeam.GetValue(key, g_Thrower.Team))
+	if (!g_FlashbangsTeam.GetValue(entity, g_Thrower.Team))
 	{
 		g_Thrower.Team = CS_TEAM_NONE;
 	}
 	
-	g_Map_FlashThrowerTeam.Remove(key);
+	g_FlashbangsTeam.Remove(entity);
 }
 
 public void Event_PlayerBlind(Event event, const char[] name, bool dontBroadcast)
