@@ -1,6 +1,9 @@
 # Description
 Players will not be flashed by their teammates.
 
+# Dependencies
+- Intmap (include-file) - https://github.com/Ilusion9/intmap-inc-sm
+
 # Alliedmods
 https://forums.alliedmods.net/showthread.php?p=2677990
 
